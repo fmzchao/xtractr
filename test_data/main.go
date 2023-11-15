@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/fmzchao/xtractr"
 	"io"
 	"os"
 	"path/filepath"
@@ -58,12 +59,23 @@ func ExtractZipWithPassword(zipFilePath, outputDir, password string) error {
 }
 func main() {
 	zipFile := "./withpassword.zip" // ZIP文件路径
-	outputDir := "./temp"           // 解压目标文件夹
-	password := "some_password"     // ZIP文件的密码
+	outputDir := "./temp/"          // 解压目标文件夹
 
-	if err := ExtractZipWithPassword(zipFile, outputDir, password); err != nil {
+	var zipxFile = &xtractr.XFile{
+		FilePath:  zipFile,
+		OutputDir: outputDir,
+		Password:  "some_password",
+	}
+	num, fils, err := xtractr.ExtractZipWithPassword(zipxFile)
+	if err != nil {
 		fmt.Printf("Error extracting zip file: %s\n", err)
 	} else {
-		fmt.Println("Zip file extracted successfully.")
+		fmt.Println("Zip file extracted successfully.", num, fils)
 	}
+	/*	if err := ExtractZipWithPassword(zipFile, outputDir, password); err != nil {
+			fmt.Printf("Error extracting zip file: %s\n", err)
+		} else {
+			fmt.Println("Zip file extracted successfully.")
+		}*/
+
 }

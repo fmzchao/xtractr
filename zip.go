@@ -2,16 +2,17 @@ package xtractr
 
 import (
 	"fmt"
+	"github.com/yeka/zip"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/yeka/zip"
 )
 
-// ExtractZIP extracts a zip file to a destination, supporting password-protected files if needed.
+/* How to extract a ZIP file. */
+
+// ExtractZIP extracts a zip file.. to a destination. Simple enough.
 func ExtractZIP(xFile *XFile) (int64, []string, error) {
-	// Open the zip file using yeka/zip
 	zipReader, err := zip.OpenReader(xFile.FilePath)
 	if err != nil {
 		return 0, nil, fmt.Errorf("zip.OpenReader: %w", err)
@@ -21,32 +22,23 @@ func ExtractZIP(xFile *XFile) (int64, []string, error) {
 	files := []string{}
 	size := int64(0)
 
-	for _, zipFile := range zipReader.File {
-		//过滤掉隐藏文件和目录,如: __MACOSX目录, .DS_Store
-		if strings.Contains(zipFile.Name, "__MACOSX") || strings.HasPrefix(zipFile.Name, ".") {
-			continue
-		}
-		fmt.Printf("Extracting %s\n", zipFile.Name)
-		if xFile.Password != "" && zipFile.IsEncrypted() {
-			zipFile.SetPassword(xFile.Password)
-			fmt.Println("x.Password", xFile.Password)
-		}
+	for _, zipFile := range zipReader.Reader.File {
 		fSize, err := xFile.unzip(zipFile)
 		if err != nil {
 			return size, files, fmt.Errorf("%s: %w", xFile.FilePath, err)
 		}
 
-		files = append(files, filepath.Join(xFile.OutputDir, zipFile.Name))
+		files = append(files, filepath.Join(xFile.OutputDir, zipFile.Name)) //nolint: gosec
 		size += fSize
 	}
 
 	return size, files, nil
 }
 
-func (x *XFile) unzip(zipFile *zip.File) (int64, error) {
-
+func (x *XFile) unzip(zipFile *zip.File) (int64, error) { //nolint:dupl
 	wfile := x.clean(zipFile.Name)
 	if !strings.HasPrefix(wfile, x.OutputDir) {
+		// The file being written is trying to write outside of our base path. Malicious archive?
 		return 0, fmt.Errorf("%s: %w: %s (from: %s)", zipFile.FileInfo().Name(), ErrInvalidPath, wfile, zipFile.Name)
 	}
 
@@ -54,10 +46,9 @@ func (x *XFile) unzip(zipFile *zip.File) (int64, error) {
 		if err := os.MkdirAll(wfile, x.DirMode); err != nil {
 			return 0, fmt.Errorf("making zipFile dir: %w", err)
 		}
+
 		return 0, nil
 	}
-
-	// Set the password for the file if needed
 
 	zFile, err := zipFile.Open()
 	if err != nil {
@@ -71,4 +62,58 @@ func (x *XFile) unzip(zipFile *zip.File) (int64, error) {
 	}
 
 	return s, nil
+}
+func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
+	// 打开ZIP文件
+	zipReader, err := zip.OpenReader(xFile.FilePath)
+	if err != nil {
+		return 0, nil, fmt.Errorf("failed to open zip file: %v", err)
+	}
+	defer zipReader.Close()
+	files := []string{}
+	size := int64(0)
+	// 遍历ZIP文件中的每个文件/目录
+	for _, f := range zipReader.File {
+		// 为这个文件/目录设置密码
+		if xFile.Password != "" && f.IsEncrypted() {
+			f.SetPassword(xFile.Password)
+		}
+		//跳过隐藏文件和隐藏文件夹
+		if strings.HasPrefix(f.Name, ".") || strings.Contains(f.Name, "__MACOSX") {
+			continue
+		}
+		fpath := filepath.Join(xFile.OutputDir, f.Name)
+
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(fpath, os.ModePerm)
+			continue
+		}
+
+		if err := os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
+			return 0, nil, fmt.Errorf("failed to create directory: %v", err)
+		}
+
+		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			return 0, nil, fmt.Errorf("failed to open file: %v", err)
+		}
+
+		rc, err := f.Open()
+		if err != nil {
+			outFile.Close()
+			return 0, nil, fmt.Errorf("failed to open file inside zip: %v", err)
+		}
+
+		s, err := io.Copy(outFile, rc)
+		size += s
+		files = append(files, filepath.Join(xFile.OutputDir, f.Name))
+		outFile.Close()
+		rc.Close()
+
+		if err != nil {
+			return 0, nil, fmt.Errorf("password error: %v", err)
+		}
+	}
+
+	return size, files, nil
 }
