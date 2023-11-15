@@ -1,4 +1,4 @@
-module golift.io/xtractr
+module github.com/fmzchao/xtractr
 
 go 1.19
 
@@ -7,6 +7,7 @@ require (
 	github.com/kdomanski/iso9660 v0.4.0
 	github.com/nwaples/rardecode v1.1.3
 	github.com/stretchr/testify v1.8.4
+	github.com/yeka/zip v0.0.0-20180914125537-d046722c6feb
 )
 
 require (
@@ -20,7 +21,6 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
-	github.com/yeka/zip v0.0.0-20180914125537-d046722c6feb // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/text v0.14.0 // indirect
