@@ -70,6 +70,10 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 		return 0, nil, fmt.Errorf("failed to open zip file: %v", err)
 	}
 	defer zipReader.Close()
+	//跳过zip为空的文件
+	if len(zipReader.File) == 0 {
+		return 0, nil, fmt.Errorf("zip file is empty")
+	}
 	files := []string{}
 	size := int64(0)
 	// 遍历ZIP文件中的每个文件/目录

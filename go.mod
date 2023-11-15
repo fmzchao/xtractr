@@ -8,6 +8,7 @@ require (
 	github.com/nwaples/rardecode v1.1.3
 	github.com/stretchr/testify v1.8.4
 	github.com/yeka/zip v0.0.0-20180914125537-d046722c6feb
+	golift.io/xtractr v0.2.2
 )
 
 require (
