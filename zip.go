@@ -51,17 +51,16 @@ func (x *XFile) unzip(zipFile *zip.File) (int64, error) {
 		}
 		return 0, nil
 	}
-
+	fmt.Println("x.Password", x.Password)
+	// Set the password for the file if needed
+	if x.Password != "" && zipFile.IsEncrypted() {
+		zipFile.SetPassword(x.Password)
+	}
 	zFile, err := zipFile.Open()
 	if err != nil {
 		return 0, fmt.Errorf("zipFile.Open: %w", err)
 	}
 	defer zFile.Close()
-
-	// Set the password for the file if needed
-	if x.Password != "" && zipFile.IsEncrypted() {
-		zipFile.SetPassword(x.Password)
-	}
 
 	s, err := writeFile(wfile, zFile, x.FileMode, x.DirMode)
 	if err != nil {
