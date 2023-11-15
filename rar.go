@@ -84,10 +84,17 @@ func (x *XFile) unrar(rarReader *rardecode.ReadCloser) (int64, []string, error) 
 
 		switch {
 		case errors.Is(err, io.EOF):
+			// 如果是正常的 EOF，结束循环
 			return size, files, nil
 		case err != nil:
+			if errors.Is(err, io.ErrUnexpectedEOF) {
+				// 如果是 unexpected EOF，忽略这个错误并继续
+				return size, files, nil
+			}
+			// 其他错误，退出并返回错误
 			return size, files, fmt.Errorf("rarReader.Next: %w", err)
 		case header == nil:
+			// 如果 header 为 nil，返回错误
 			return size, files, fmt.Errorf("%w: %s", ErrInvalidHead, x.FilePath)
 		}
 
@@ -112,7 +119,7 @@ func (x *XFile) unrar(rarReader *rardecode.ReadCloser) (int64, []string, error) 
 		}
 
 		fSize, err := writeFile(wfile, rarReader, x.FileMode, x.DirMode)
-		if err != nil {
+		if err != nil && (!strings.Contains(err.Error(), "unexpected EOF")) {
 			return size, files, err
 		}
 

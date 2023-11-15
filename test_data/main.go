@@ -58,15 +58,16 @@ func ExtractZipWithPassword(zipFilePath, outputDir, password string) error {
 	return nil
 }
 func main() {
-	zipFile := "./withpassword.zip" // ZIP文件路径
+	zipFile := "./123123132150.rar" // ZIP文件路径
 	outputDir := "./temp/"          // 解压目标文件夹
 
 	var zipxFile = &xtractr.XFile{
 		FilePath:  zipFile,
 		OutputDir: outputDir,
-		Password:  "some_password",
+		FileMode:  0644, // ignored for tar files.
+		DirMode:   0755,
 	}
-	num, fils, err := xtractr.ExtractZipWithPassword(zipxFile)
+	num, fils, _, err := xtractr.ExtractRAR(zipxFile)
 	if err != nil {
 		fmt.Printf("Error extracting zip file: %s\n", err)
 	} else {
