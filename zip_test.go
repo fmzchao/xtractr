@@ -45,7 +45,7 @@ func TestExtractZIP(t *testing.T) {
 		{
 			name:      "Wrong password",
 			filePath:  "test_data/withpassword.zip",
-			password:  "wrongpassword",
+			password:  "wrong_password",
 			wantErr:   true,
 			wantFiles: 0,
 		},

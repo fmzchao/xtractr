@@ -57,9 +57,9 @@ func ExtractZipWithPassword(zipFilePath, outputDir, password string) error {
 	return nil
 }
 func main() {
-	zipFile := "./archive.zip"  // ZIP文件路径
-	outputDir := "./temp"       // 解压目标文件夹
-	password := "some_password" // ZIP文件的密码
+	zipFile := "./withpassword.zip" // ZIP文件路径
+	outputDir := "./temp"           // 解压目标文件夹
+	password := "some_password"     // ZIP文件的密码
 
 	if err := ExtractZipWithPassword(zipFile, outputDir, password); err != nil {
 		fmt.Printf("Error extracting zip file: %s\n", err)

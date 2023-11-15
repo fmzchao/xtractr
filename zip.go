@@ -27,6 +27,10 @@ func ExtractZIP(xFile *XFile) (int64, []string, error) {
 			continue
 		}
 		fmt.Printf("Extracting %s\n", zipFile.Name)
+		if xFile.Password != "" && zipFile.IsEncrypted() {
+			zipFile.SetPassword(xFile.Password)
+			fmt.Println("x.Password", xFile.Password)
+		}
 		fSize, err := xFile.unzip(zipFile)
 		if err != nil {
 			return size, files, fmt.Errorf("%s: %w", xFile.FilePath, err)
@@ -40,6 +44,7 @@ func ExtractZIP(xFile *XFile) (int64, []string, error) {
 }
 
 func (x *XFile) unzip(zipFile *zip.File) (int64, error) {
+
 	wfile := x.clean(zipFile.Name)
 	if !strings.HasPrefix(wfile, x.OutputDir) {
 		return 0, fmt.Errorf("%s: %w: %s (from: %s)", zipFile.FileInfo().Name(), ErrInvalidPath, wfile, zipFile.Name)
@@ -51,11 +56,9 @@ func (x *XFile) unzip(zipFile *zip.File) (int64, error) {
 		}
 		return 0, nil
 	}
-	fmt.Println("x.Password", x.Password)
+
 	// Set the password for the file if needed
-	if x.Password != "" && zipFile.IsEncrypted() {
-		zipFile.SetPassword(x.Password)
-	}
+
 	zFile, err := zipFile.Open()
 	if err != nil {
 		return 0, fmt.Errorf("zipFile.Open: %w", err)
