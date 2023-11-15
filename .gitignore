@@ -11,3 +11,4 @@
 *.tbz2
 /cmd/xt/xt
 /xt
+.idea
