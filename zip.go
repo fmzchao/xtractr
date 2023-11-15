@@ -22,6 +22,11 @@ func ExtractZIP(xFile *XFile) (int64, []string, error) {
 	size := int64(0)
 
 	for _, zipFile := range zipReader.File {
+		//过滤掉隐藏文件和目录,如: __MACOSX目录, .DS_Store
+		if strings.Contains(zipFile.Name, "__MACOSX") || strings.HasPrefix(zipFile.Name, ".") {
+			continue
+		}
+		fmt.Printf("Extracting %s\n", zipFile.Name)
 		fSize, err := xFile.unzip(zipFile)
 		if err != nil {
 			return size, files, fmt.Errorf("%s: %w", xFile.FilePath, err)

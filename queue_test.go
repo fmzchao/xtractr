@@ -1,13 +1,13 @@
 package xtractr_test
 
 import (
+	"github.com/fmzchao/xtractr"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"golift.io/xtractr"
 )
 
 //nolint:gochecknoglobals

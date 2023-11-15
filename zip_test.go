@@ -1,7 +1,7 @@
 package xtractr_test
 
 import (
-	"golift.io/xtractr"
+	"github.com/fmzchao/xtractr"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -30,28 +30,28 @@ func TestExtractZIP(t *testing.T) {
 	}{
 		{
 			name:      "No password",
-			filePath:  "testdata/nopassword.zip",
+			filePath:  "test_data/nopassword.zip",
 			password:  "",
 			wantErr:   false,
 			wantFiles: 3, // 假设无密码ZIP包含3个文件
 		},
 		{
 			name:      "With password",
-			filePath:  "testdata/withpassword.zip",
-			password:  "correctpassword",
+			filePath:  "test_data/withpassword.zip",
+			password:  "some_password",
 			wantErr:   false,
-			wantFiles: 2, // 假设有密码ZIP包含2个文件
+			wantFiles: 6, // 假设有密码ZIP包含2个文件
 		},
 		{
 			name:      "Wrong password",
-			filePath:  "testdata/withpassword.zip",
+			filePath:  "test_data/withpassword.zip",
 			password:  "wrongpassword",
 			wantErr:   true,
 			wantFiles: 0,
 		},
 		{
 			name:      "File does not exist",
-			filePath:  "testdata/nonexistent.zip",
+			filePath:  "test_data/nonexistent.zip",
 			password:  "",
 			wantErr:   true,
 			wantFiles: 0,
