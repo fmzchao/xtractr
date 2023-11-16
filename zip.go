@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/yeka/zip"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -102,6 +103,11 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 
 		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
+			if strings.Contains(err.Error(), "illegal byte sequence") {
+				// 记录错误，跳过当前文件
+				log.Printf("Warning: Skipping file %s due to illegal byte sequence error: %v\n", f.Name, err)
+				continue
+			}
 			return 0, nil, fmt.Errorf("failed to open file: %v", err)
 		}
 
