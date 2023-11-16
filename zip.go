@@ -136,7 +136,7 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 func cleanFileName(name string) string {
 	cleaned := ""
 	for _, r := range name {
-		if r > 31 && r < 127 && r != '/' && r != '\\' && r != ':' && r != '*' && r != '?' && r != '"' && r != '<' && r != '>' && r != '|' {
+		if r > 31 && r < 127 {
 			cleaned += string(r)
 		} else {
 			cleaned += "_"
