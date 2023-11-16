@@ -78,6 +78,9 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 	size := int64(0)
 	// 遍历ZIP文件中的每个文件/目录
 	for _, f := range zipReader.File {
+		if f.IsEncrypted() && xFile.Password == "" {
+			return 0, nil, fmt.Errorf("zip file is encrypted, please set password")
+		}
 		// 为这个文件/目录设置密码
 		if xFile.Password != "" && f.IsEncrypted() {
 			f.SetPassword(xFile.Password)
