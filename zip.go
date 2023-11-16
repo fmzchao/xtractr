@@ -90,7 +90,8 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 		if strings.HasPrefix(f.Name, ".") || strings.Contains(f.Name, "__MACOSX") {
 			continue
 		}
-		fpath := filepath.Join(xFile.OutputDir, f.Name)
+		cleanedName := cleanFileName(f.Name)
+		fpath := filepath.Join(xFile.OutputDir, cleanedName)
 
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(fpath, os.ModePerm)
@@ -129,4 +130,17 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 	}
 
 	return size, files, nil
+}
+
+// cleanFileName 清理文件名中的非法字符
+func cleanFileName(name string) string {
+	cleaned := ""
+	for _, r := range name {
+		if r > 31 && r < 127 && r != '/' && r != '\\' && r != ':' && r != '*' && r != '?' && r != '"' && r != '<' && r != '>' && r != '|' {
+			cleaned += string(r)
+		} else {
+			cleaned += "_"
+		}
+	}
+	return cleaned
 }
