@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode"
 )
 
 /* How to extract a ZIP file. */
@@ -132,14 +133,14 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 	return size, files, nil
 }
 
-// cleanFileName 清理文件名中的非法字符
+// cleanFileName 清理文件名中的非法字符，使用 Unicode 码点表示替换非法字符
 func cleanFileName(name string) string {
 	cleaned := ""
 	for _, r := range name {
-		if r > 31 && r < 127 {
+		if unicode.IsPrint(r) && r < 127 {
 			cleaned += string(r)
 		} else {
-			cleaned += "_"
+			cleaned += fmt.Sprintf("_%X_", r)
 		}
 	}
 	return cleaned
