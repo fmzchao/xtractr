@@ -140,7 +140,7 @@ func cleanFileName(name string) string {
 		if unicode.IsPrint(r) && r < 127 {
 			cleaned += string(r)
 		} else {
-			cleaned += fmt.Sprintf("_%X_", r)
+			cleaned += fmt.Sprintf("%X", r)
 		}
 	}
 	return cleaned
