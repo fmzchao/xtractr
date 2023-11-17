@@ -143,5 +143,8 @@ func cleanFileName(name string) string {
 			cleaned += fmt.Sprintf("%X", r)
 		}
 	}
+	if len(cleaned) > 255 {
+		cleaned = cleaned[:255]
+	}
 	return cleaned
 }
