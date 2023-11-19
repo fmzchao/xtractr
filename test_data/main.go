@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/yeka/zip"
 )
@@ -58,21 +59,24 @@ func ExtractZipWithPassword(zipFilePath, outputDir, password string) error {
 	return nil
 }
 func main() {
-	zipFile := "./123123132150.rar" // ZIP文件路径
-	outputDir := "./temp/"          // 解压目标文件夹
+	start := time.Now()
+	zipFile := "./G2pak.part01_pass|@G2Pak.rar" // ZIP文件路径
+	outputDir := "/tmp/temp5/"                  // 解压目标文件夹
 
 	var zipxFile = &xtractr.XFile{
 		FilePath:  zipFile,
 		OutputDir: outputDir,
 		FileMode:  0644, // ignored for tar files.
 		DirMode:   0755,
+		Password:  "@G2Pak",
 	}
 	num, fils, _, err := xtractr.ExtractRAR(zipxFile)
 	if err != nil {
 		fmt.Printf("Error extracting zip file: %s\n", err)
 	} else {
-		fmt.Println("Zip file extracted successfully.", num, fils)
+		fmt.Println("Zip file extracted successfully.", num, len(fils))
 	}
+	fmt.Println("耗时：", time.Since(start))
 	/*	if err := ExtractZipWithPassword(zipFile, outputDir, password); err != nil {
 			fmt.Printf("Error extracting zip file: %s\n", err)
 		} else {

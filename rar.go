@@ -35,6 +35,8 @@ func ExtractRAR(xFile *XFile) (int64, []string, []string, error) {
 		})
 		if err == nil {
 			return size, files, archives, nil
+		} else {
+			fmt.Println(err)
 		}
 
 		// https://github.com/nwaples/rardecode/issues/28
@@ -87,7 +89,7 @@ func (x *XFile) unrar(rarReader *rardecode.ReadCloser) (int64, []string, error) 
 			// 如果是正常的 EOF，结束循环
 			return size, files, nil
 		case err != nil:
-			if errors.Is(err, io.ErrUnexpectedEOF) {
+			if errors.Is(err, io.ErrUnexpectedEOF) || strings.Contains(err.Error(), "copying io") || strings.Contains(err.Error(), "bad header crc") {
 				// 如果是 unexpected EOF，忽略这个错误并继续
 				return size, files, nil
 			}
@@ -119,7 +121,7 @@ func (x *XFile) unrar(rarReader *rardecode.ReadCloser) (int64, []string, error) 
 		}
 
 		fSize, err := writeFile(wfile, rarReader, x.FileMode, x.DirMode)
-		if err != nil && (!strings.Contains(err.Error(), "unexpected EOF")) {
+		if err != nil && (!strings.Contains(err.Error(), "unexpected EOF")) && (!strings.Contains(err.Error(), "copying io")) && (!strings.Contains(err.Error(), "bad header crc")) {
 			return size, files, err
 		}
 
