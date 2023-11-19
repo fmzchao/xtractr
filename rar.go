@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -110,14 +111,18 @@ func (x *XFile) unrar(rarReader *rardecode.ReadCloser) (int64, []string, error) 
 
 		if header.IsDir {
 			if err = os.MkdirAll(wfile, x.DirMode); err != nil {
-				return size, files, fmt.Errorf("os.MkdirAll: %w", err)
+				//return size, files, fmt.Errorf("os.MkdirAll: %w", err)
+				log.Printf("Error creating directory: %v", err)
+				continue
 			}
 
 			continue
 		}
 
 		if err = os.MkdirAll(filepath.Dir(wfile), x.DirMode); err != nil {
-			return size, files, fmt.Errorf("os.MkdirAll: %w", err)
+			log.Printf("Error creating directory: %v", err)
+			continue
+			//return size, files, fmt.Errorf("os.MkdirAll: %w", err)
 		}
 
 		fSize, err := writeFile(wfile, rarReader, x.FileMode, x.DirMode)
