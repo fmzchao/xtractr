@@ -79,6 +79,12 @@ func extractRAR(xFile *XFile) (int64, []string, []string, error) {
 }
 
 func (x *XFile) unrar(rarReader *rardecode.ReadCloser) (int64, []string, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("Program recovered from error: %v\n", r)
+		}
+	}()
+
 	files := []string{}
 	size := int64(0)
 

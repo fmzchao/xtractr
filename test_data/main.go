@@ -60,15 +60,15 @@ func ExtractZipWithPassword(zipFilePath, outputDir, password string) error {
 }
 func main() {
 	start := time.Now()
-	zipFile := "./G2pak.part01_pass|@G2Pak.rar" // ZIP文件路径
-	outputDir := "/tmp/temp5/"                  // 解压目标文件夹
+	zipFile := "./keymaker.rar" // ZIP文件路径
+	outputDir := "/tmp/temp5/"  // 解压目标文件夹
 
 	var zipxFile = &xtractr.XFile{
 		FilePath:  zipFile,
 		OutputDir: outputDir,
 		FileMode:  0644, // ignored for tar files.
 		DirMode:   0755,
-		Password:  "@G2Pak",
+		Password:  "",
 	}
 	num, fils, _, err := xtractr.ExtractRAR(zipxFile)
 	if err != nil {
