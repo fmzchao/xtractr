@@ -1,6 +1,8 @@
 package xtractr
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"github.com/yeka/zip"
 	"io"
@@ -109,6 +111,10 @@ func ExtractZipWithPassword(xFile *XFile) (int64, []string, error) {
 				// 记录错误，跳过当前文件
 				log.Printf("Warning: Skipping file %s due to illegal byte sequence error: %v\n", f.Name, err)
 				continue
+			} else if strings.Contains(err.Error(), "is a directory") {
+				// 记录错误，跳过当前文件
+				log.Printf("Warning: Skipping file %s due to is a directory error: %v\n", f.Name, err)
+				continue
 			}
 			return 0, nil, fmt.Errorf("failed to open file: %v", err)
 		}
@@ -144,7 +150,15 @@ func cleanFileName(name string) string {
 		}
 	}
 	if len(cleaned) > 255 {
-		cleaned = cleaned[:255]
+		cleaned = CalculateMD5(cleaned)
 	}
 	return cleaned
+}
+
+// CalculateMD5 计算给定字符串的 MD5 哈希
+func CalculateMD5(text string) string {
+	hashes := md5.New()
+	hashes.Write([]byte(text))
+	md5Hash := hashes.Sum(nil)
+	return hex.EncodeToString(md5Hash)
 }
